@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rejestracja wejścia</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 30px; max-width: 400px; margin: 0 auto; box-shadow: 2px 2px 8px rgba(0,0,0,0.1); }
+    button { background-color: #ff5722; color: white; padding: 10px 20px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #e64a19; }
+    .summary { margin-top: 20px; color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Rejestracja wejścia</h2>
+    <p id="tag-id">Tag ID: ...</p>
+    <p id="entry-time">Czas wejścia: ...</p>
+    <button id="exit-btn">WYSZEDŁ</button>
+    <p class="summary" id="summary"></p>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const tagId = urlParams.get('id');
+    const now = new Date();
+    const formattedTime = now.toLocaleString('pl-PL', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+
+    document.getElementById('tag-id').innerText = `Tag ID: ${tagId}`;
+    document.getElementById('entry-time').innerText = `Czas wejścia: ${formattedTime}`;
+
+    document.getElementById('exit-btn').addEventListener('click', async () => {
+      const response = await fetch(`https://script.google.com/macros/s/AKfycbzm9MUENMg8gQMxruXzyNSlXzAxdtnA7jngJOJtQw4KbY3ZknWSe2AFxnXk-CdHXiSP/exec?id=${tagId}`);
+      const result = await response.json();
+      if (result.tagId && result.duration) {
+        document.getElementById('summary').innerText = `Dziecko z tagiem ${result.tagId} było w bawialni: ${result.duration}`;
+      } else {
+        document.getElementById('summary').innerText = "Nie udało się odczytać czasu pobytu.";
+      }
+    });
+  </script>
+</body>
+</html>
